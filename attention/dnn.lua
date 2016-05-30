@@ -75,8 +75,6 @@ function train(dataset)
     
     for t = 1, nsamples, batchSize do
         xlua.progress(t,nsamples)
-        -- inputs = torch.Tensor(batchSize,nfeatdim)
-        -- targets = torch.Tensor(batchSize)
         inputs = {}
         targets = {}
         
@@ -91,27 +89,17 @@ function train(dataset)
             end
             inputs[k] = input
             targets[k] = target
-            -- print('test')
-            -- print(input, target)
             k = k + 1
         end
         local feval = function()
             gradparams:zero()
             inputs = torch.Tensor(inputs)
             targets = torch.Tensor(targets)
-            -- print('inputs')
-            -- print(inputs)
             local outputs = model:forward(inputs)
             local error = criterion:forward(outputs,targets)
             local gradoutputs = criterion:backward(outputs,targets)
             model:backward(inputs,gradoutputs)
-            -- print('error')
-            -- print(error)
-            -- Gradients:
             confusion:batchAdd(outputs, targets)
-            -- print(#inputs)
-            -- error = error / inputs:size(1)
-            -- gradparams:div(inputs:size(1))
             return error,gradparams
         end
         optim.sgd(feval,parameters,optimstate)

@@ -1,5 +1,5 @@
 require 'nn'
-require 'dataset'
+require 'data'
 require 'torch'
 
 cmd = torch.CmdLine()
@@ -7,9 +7,6 @@ cmd:option('-data','','data file name')
 opts = cmd:parse(arg or {})
 
 torch.setdefaulttensortype('torch.FloatTensor')
-local data = parsedatafordnn(opts.data)
+local data = parsedata(opts.data)
 print(data[{{1,10},{}}])
 
--- shuffle the tensor row wise
-function getshuffleddata(datatensor)
-	local shuffle = torch.randperm(datatensor:size())

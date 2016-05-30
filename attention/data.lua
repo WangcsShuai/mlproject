@@ -26,9 +26,12 @@ function getdatafromfile(fname)
 		local splits = line:split('\t')
 		local val1 = splits[1]
 		local val2 = splits[2]
-		outputtensor[{{c},{1}}] = tonumber(val1)
-		outputtensor[{{c},{2}}] = tonumber(val2)
-		c = c +1
+		if val2 ~= 0 then
+			outputtensor[{{c},{1}}] = tonumber(val1)
+			outputtensor[{{c},{2}}] = tonumber(val2)
+			c = c + 1
+		end
+		
 	end
 	return outputtensor
 end
