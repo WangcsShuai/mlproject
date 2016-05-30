@@ -35,3 +35,19 @@ function getdatafromfile(fname)
 	end
 	return outputtensor
 end
+
+function getdatafromCSV(filename)
+	local linetotarget = {}
+	local overalldata = {}
+	for line in io.lines(filename) do
+		local splits = line:split(',')
+		local featdim = #splits - 1
+		local temp = torch.Tensor(splits)
+		local data = temp[{{1,featdim}}]
+		local target = tonumber(splits[featdim+1])
+		overalldata[#overalldata+1] = data:totable()
+		linetotarget[#linetotarget+1] = target
+	end
+
+	return torch.Tensor(overalldata),torch.Tensor(linetotarget)
+end
