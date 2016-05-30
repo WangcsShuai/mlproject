@@ -1,0 +1,48 @@
+require 'nn'
+local Attention, parent = torch.class('nn.Attention','nn.Module')
+
+function Attention:__init(inputsize, outputsize)
+    parent.__init(self)
+    self.inputsize = inputsize
+    self.outputsize = outputsize
+
+    self.module = self:buildModule()
+end
+
+
+function Attention:buildModule()
+    local module = nn.Sequential()
+    local attention = nn.Sequential()
+    local passthough = nn.Sequential()
+    local concat = nn.ConcatTable()
+    
+    attention:add(nn.Linear(self.inputsize,1))
+    attention:add(nn.Tanh())
+    attention:add(nn.View(-1))
+    attention:add(nn.SoftMax())
+    attention:add(nn.View(-1,1))
+
+    passthough:add(nn.Identity())
+    concat:add(attention)
+    concat:add(passthough)
+    module:add(concat)
+    module:add(nn.MM(true,false))
+    module:add(nn.View(-1))
+    return module
+end
+
+function Attention:updateOutput(input)
+    local dim = input:size(2)
+    self.output = self.output:resize(dim):zero()
+    self.output:copy(self.module:forward(input))
+    return self.output
+end
+
+
+function Attention:updateGradInput(input, gradOutput)
+    self.gradInput:resizeAs(input):zero()
+    self.gradInput:copy(self.module:backward(input,gradOutput))
+    return self.gradInput
+end
+
+
